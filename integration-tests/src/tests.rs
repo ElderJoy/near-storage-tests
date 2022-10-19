@@ -1,6 +1,6 @@
-use std::{env, fs};
 use near_units::parse_near;
 use serde_json::json;
+use std::{env, fs};
 use workspaces::{Account, Contract};
 
 #[tokio::main]
@@ -15,7 +15,7 @@ async fn main() -> anyhow::Result<()> {
     // create accounts
     let account = worker.dev_create_account().await?;
     let alice = account
-        .create_subaccount( "alice")
+        .create_subaccount("alice")
         .initial_balance(parse_near!("30 N"))
         .transact()
         .await?
@@ -27,12 +27,9 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn test_default_message(
-    user: &Account,
-    contract: &Contract,
-) -> anyhow::Result<()> {
+async fn test_default_message(user: &Account, contract: &Contract) -> anyhow::Result<()> {
     let message: String = user
-        .call( contract.id(), "get_greeting")
+        .call(contract.id(), "get_greeting")
         .args_json(json!({}))
         .transact()
         .await?
@@ -43,10 +40,20 @@ async fn test_default_message(
     Ok(())
 }
 
-async fn test_changes_message(
-    user: &Account,
-    contract: &Contract,
-) -> anyhow::Result<()> {
+async fn test_default_message(user: &Account, contract: &Contract) -> anyhow::Result<()> {
+    let message: String = user
+        .call(contract.id(), "get_greeting")
+        .args_json(json!({}))
+        .transact()
+        .await?
+        .json()?;
+
+    assert_eq!(message, "Hello".to_string());
+    println!("      Passed ✅ gets default message");
+    Ok(())
+}
+
+async fn test_changes_message(user: &Account, contract: &Contract) -> anyhow::Result<()> {
     user.call(contract.id(), "set_greeting")
         .args_json(json!({"message": "Howdy"}))
         .transact()
